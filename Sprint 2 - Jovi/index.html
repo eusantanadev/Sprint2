@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartCam & AutoLegenda</title>
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome para Ícones -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Configuração de Cores Tailwind -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            gold: {
+              300: '#f3e5ab',
+              400: '#e5c158',
+              500: '#d4af37',
+              600: '#b8860b',
+              700: '#996515',
+            },
+            dark: {
+              900: '#0c0a09',
+              800: '#141210',
+              700: '#1c1917',
+              600: '#292524',
+              500: '#44403c',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0c0a09;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #292524;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #d4af37;
+    }
+    .scrollbar-none::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-none {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="bg-dark-900 text-stone-200 antialiased font-sans h-screen overflow-hidden flex flex-col justify-between selection:bg-gold-500 selection:text-dark-900">
+
+  <!-- HEADER MOBILE -->
+  <header class="md:hidden flex items-center justify-between p-4 border-b border-stone-800 bg-dark-800/80 backdrop-blur sticky top-0 z-40 shrink-0">
+    <div class="flex items-center space-x-2">
+      <div class="w-8 h-8 rounded-lg bg-gold-500/20 border border-gold-500/40 flex items-center justify-center text-gold-400">
+        <i class="fa-solid fa-camera text-sm"></i>
+      </div>
+      <div>
+        <h1 class="font-bold text-stone-100 tracking-wider text-sm leading-none" id="mobile-header-title">SMARTCAM</h1>
+        <span class="text-[10px] text-stone-400">Capture. Edite. Inspire.</span>
+      </div>
+    </div>
+    <button class="w-8 h-8 rounded-full border border-stone-700 flex items-center justify-center text-stone-300">
+      <i class="fa-regular fa-user text-xs"></i>
+    </button>
+  </header>
+
+  <!-- LAYOUT PRINCIPAL -->
+  <div class="flex-1 flex flex-col md:flex-row overflow-hidden max-w-[1600px] w-full mx-auto h-full">
+
+    <!-- SIDEBAR ESQUERDA -->
+    <aside class="hidden md:flex flex-col w-64 border-r border-stone-800/80 bg-dark-800/50 p-4 justify-between shrink-0 h-full">
+      <div class="space-y-6">
+        <div class="flex items-center space-x-3 px-2">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold-400/30 to-gold-600/10 border border-gold-500/40 flex items-center justify-center text-gold-400 shadow-lg shadow-gold-500/5">
+            <i class="fa-solid fa-camera text-lg"></i>
+          </div>
+          <div>
+            <h1 class="font-bold text-stone-100 tracking-wider text-base leading-tight">SMARTCAM</h1>
+            <p class="text-xs text-stone-400">Capture. Edite. Inspire.</p>
+          </div>
+        </div>
+
+        <nav class="space-y-1">
+          <button onclick="switchTab('galeria')" id="nav-galeria" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition bg-gold-500/15 border border-gold-500/30 text-gold-400">
+            <i class="fa-regular fa-image w-4"></i>
+            <span>Galeria</span>
+          </button>
+          <button onclick="switchTab('camera')" id="nav-camera" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm text-stone-400 hover:text-stone-200 transition">
+            <i class="fa-solid fa-camera w-4"></i>
+            <span>Câmera</span>
+          </button>
+          <button onclick="switchTab('edicao')" id="nav-edicao" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm text-stone-400 hover:text-stone-200 transition">
+            <i class="fa-solid fa-sliders w-4"></i>
+            <span>Edição</span>
+          </button>
+          <button onclick="switchTab('autolegenda')" id="nav-autolegenda" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm text-stone-400 hover:text-stone-200 transition">
+            <i class="fa-solid fa-closed-captioning w-4"></i>
+            <span>AutoLegenda</span>
+          </button>
+          <button onclick="switchTab('iastudio')" id="nav-iastudio" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm text-stone-400 hover:text-stone-200 transition">
+            <i class="fa-solid fa-wand-magic-sparkles w-4"></i>
+            <span>IA Studio</span>
+          </button>
+          <button onclick="switchTab('configuracoes')" id="nav-configuracoes" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm text-stone-400 hover:text-stone-200 transition">
+            <i class="fa-solid fa-gear w-4"></i>
+            <span>Configurações</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- PERFIL E BARRA DE ARMAZENAMENTO CORRIGIDA -->
+      <div class="space-y-4 border-t border-stone-800/80 pt-4">
+        <div class="flex items-center space-x-3 px-2">
+          <div class="w-9 h-9 rounded-full bg-stone-700 overflow-hidden border border-gold-500/30 flex items-center justify-center text-xs font-bold text-gold-400">
+            U
+          </div>
+          <div class="flex-1 overflow-hidden">
+            <p class="text-sm font-medium text-stone-200 truncate">User</p>
+            <button class="text-xs text-stone-400 hover:text-rose-400 transition">Sair</button>
+          </div>
+        </div>
+
+        <div class="bg-stone-900/80 rounded-xl p-3 border border-stone-800 space-y-2">
+          <div class="flex justify-between text-xs">
+            <span class="text-stone-400">Armazenamento</span>
+            <span class="text-gold-400 font-semibold">68% usado</span>
+          </div>
+          <div class="w-full h-1.5 bg-stone-800 rounded-full overflow-hidden">
+            <div class="h-full bg-gold-400 rounded-full" style="width: 68%;"></div>
+          </div>
+          <p class="text-[11px] text-stone-400">6,8 GB de 10 GB</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ÁREA PRINCIPAL -->
+    <main class="flex-1 overflow-y-auto pb-20 md:pb-6 p-4 md:p-6 h-full space-y-6">
+
+      <!-- VIEW 1: GALERIA -->
+      <section id="view-galeria" class="space-y-6">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="relative w-full sm:max-w-md">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-xs"></i>
+            <input type="text" placeholder="Pesquisar fotos..." class="w-full bg-stone-900/90 border border-stone-800 rounded-xl pl-10 pr-10 py-2.5 text-sm text-stone-200 placeholder-stone-400 focus:outline-none focus:border-gold-500/60 transition">
+            <button class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-200">
+              <i class="fa-solid fa-sliders text-xs"></i>
+            </button>
+          </div>
+
+          <div class="hidden md:flex items-center space-x-2 bg-stone-900/80 p-1 rounded-lg border border-stone-800 text-xs font-medium">
+            <button class="px-3 py-1.5 rounded-md bg-gold-500/20 text-gold-400 border border-gold-500/30">Simples</button>
+            <button class="px-3 py-1.5 rounded-md text-stone-400 hover:text-stone-200">Profissional</button>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-3 overflow-x-auto pb-2 pt-1 scrollbar-none">
+          <button class="flex-shrink-0 flex items-center space-x-2 bg-gold-500/20 border border-gold-500/50 text-gold-400 px-4 py-2 rounded-xl text-xs font-medium transition">
+            <i class="fa-solid fa-layer-group"></i>
+            <div class="text-left">
+              <div class="leading-none">Todas</div>
+              <div class="text-[10px] opacity-70">1.234</div>
+            </div>
+          </button>
+          <button class="flex-shrink-0 flex items-center space-x-2 bg-stone-900 border border-stone-800 text-stone-400 hover:text-stone-200 px-4 py-2 rounded-xl text-xs font-medium transition">
+            <i class="fa-solid fa-utensils"></i>
+            <div class="text-left">
+              <div class="leading-none">Comidas</div>
+              <div class="text-[10px] opacity-70">245</div>
+            </div>
+          </button>
+          <button class="flex-shrink-0 flex items-center space-x-2 bg-stone-900 border border-stone-800 text-stone-400 hover:text-stone-200 px-4 py-2 rounded-xl text-xs font-medium transition">
+            <i class="fa-solid fa-mountain"></i>
+            <div class="text-left">
+              <div class="leading-none">Lugares</div>
+              <div class="text-[10px] opacity-70">320</div>
+            </div>
+          </button>
+          <button class="flex-shrink-0 flex items-center space-x-2 bg-stone-900 border border-stone-800 text-stone-400 hover:text-stone-200 px-4 py-2 rounded-xl text-xs font-medium transition">
+            <i class="fa-solid fa-users"></i>
+            <div class="text-left">
+              <div class="leading-none">Pessoas</div>
+              <div class="text-[10px] opacity-70">186</div>
+            </div>
+          </button>
+          <button class="flex-shrink-0 flex items-center space-x-2 bg-stone-900 border border-stone-800 text-stone-400 hover:text-stone-200 px-4 py-2 rounded-xl text-xs font-medium transition">
+            <i class="fa-solid fa-video"></i>
+            <div class="text-left">
+              <div class="leading-none">Vídeos</div>
+              <div class="text-[10px] opacity-70">96</div>
+            </div>
+          </button>
+          <button class="flex-shrink-0 flex items-center space-x-2 bg-stone-900 border border-stone-800 text-stone-400 hover:text-stone-200 px-4 py-2 rounded-xl text-xs font-medium transition">
+            <i class="fa-solid fa-heart"></i>
+            <div class="text-left">
+              <div class="leading-none">Favoritas</div>
+              <div class="text-[10px] opacity-70">87</div>
+            </div>
+          </button>
+        </div>
+
+        <div class="bg-stone-900/90 border border-stone-800 rounded-2xl p-4 flex items-center justify-between shadow-lg">
+          <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 rounded-lg bg-gold-500/20 text-gold-400 flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-wand-magic-sparkles text-sm"></i>
+            </div>
+            <div>
+              <p class="text-xs sm:text-sm font-semibold text-stone-200">IA organizou 12 novas fotos para você</p>
+              <p class="text-[11px] text-stone-400">Analisadas e categorizadas automaticamente.</p>
+            </div>
+          </div>
+          <button class="px-3 py-1.5 border border-gold-500/40 rounded-xl text-xs text-gold-400 hover:bg-gold-500/10 transition flex items-center space-x-1 shrink-0">
+            <span>Ver novas</span>
+            <i class="fa-solid fa-arrow-right text-xs"></i>
+          </button>
+        </div>
+
+        <div class="flex items-center justify-between pt-2">
+          <span class="text-xs font-semibold text-stone-300">Hoje · 14 de Maio</span>
+          <label class="flex items-center space-x-2 text-xs text-stone-400 cursor-pointer hover:text-stone-200">
+            <span>Selecionar</span>
+            <input type="checkbox" class="rounded border-stone-800 bg-stone-900 text-gold-500 focus:ring-0">
+          </label>
+        </div>
+
+        <div class="grid grid-cols-3 md:grid-cols-4 gap-2 md:gap-3">
+          <div class="aspect-square rounded-xl overflow-hidden bg-stone-800 border border-stone-800 relative group cursor-pointer">
+            <img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=500&auto=format&fit=crop&q=80" class="w-full h-full object-cover transition duration-300 group-hover:scale-105" alt="Comida">
+          </div>
+          <div class="aspect-square rounded-xl overflow-hidden bg-stone-800 border border-stone-800 relative group cursor-pointer">
+            <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=500&auto=format&fit=crop&q=80" class="w-full h-full object-cover transition duration-300 group-hover:scale-105" alt="Paisagem">
+          </div>
+          <div class="aspect-square rounded-xl overflow-hidden bg-stone-800 border border-stone-800 relative group cursor-pointer">
+            <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500&auto=format&fit=crop&q=80" class="w-full h-full object-cover transition duration-300 group-hover:scale-105" alt="Praia">
+          </div>
+          <div class="aspect-square rounded-xl overflow-hidden bg-stone-800 border border-stone-800 relative group cursor-pointer">
+            <img src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=500&auto=format&fit=crop&q=80" class="w-full h-full object-cover transition duration-300 group-hover:scale-105" alt="Trilha">
+          </div>
+          <div class="aspect-square rounded-xl overflow-hidden bg-stone-800 border border-stone-800 relative group cursor-pointer">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80" class="w-full h-full object-cover transition duration-300 group-hover:scale-105" alt="Pessoa">
+          </div>
+          <div class="aspect-square rounded-xl overflow-hidden bg-stone-800 border border-stone-800 relative group cursor-pointer">
+            <img src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=500&auto=format&fit=crop&q=80" class="w-full h-full object-cover transition duration-300 group-hover:scale-105" alt="Café">
+          </div>
+          <div class="aspect-square rounded-xl overflow-hidden bg-stone-800 border border-stone-800 relative group cursor-pointer">
+            <img src="https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=500&auto=format&fit=crop&q=80" class="w-full h-full object-cover transition duration-300 group-hover:scale-105" alt="Cidade">
+          </div>
+          <div class="aspect-square rounded-xl overflow-hidden bg-stone-800 border border-stone-800 relative group cursor-pointer">
+            <img src="https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=500&auto=format&fit=crop&q=80" class="w-full h-full object-cover transition duration-300 group-hover:scale-105" alt="Moto">
+          </div>
+          <div class="aspect-square rounded-xl overflow-hidden bg-stone-800 border border-stone-800 relative group cursor-pointer">
+            <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?w=500&auto=format&fit=crop&q=80" class="w-full h-full object-cover transition duration-300 group-hover:scale-105" alt="Montanhas">
+          </div>
+          <div class="aspect-square rounded-xl overflow-hidden bg-stone-800 border border-stone-800 relative group cursor-pointer">
+            <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=500&auto=format&fit=crop&q=80" class="w-full h-full object-cover transition duration-300 group-hover:scale-105" alt="Canyon">
+          </div>
+          <div class="aspect-square rounded-xl overflow-hidden bg-stone-800 border border-stone-800 relative group cursor-pointer">
+            <img src="https://images.unsplash.com/photo-1488441770602-aed21fc49bd5?w=500&auto=format&fit=crop&q=80" class="w-full h-full object-cover transition duration-300 group-hover:scale-105" alt="Sessão de fotos">
+          </div>
+          <div class="aspect-square rounded-xl overflow-hidden bg-stone-800 border border-stone-800 relative group cursor-pointer">
+            <img src="https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=500&auto=format&fit=crop&q=80" class="w-full h-full object-cover transition duration-300 group-hover:scale-105" alt="Cachoeira">
+          </div>
+        </div>
+
+        <div class="text-center pt-2 pb-4">
+          <p class="text-xs text-stone-500">Mostrando 1.234 fotos e 98 vídeos</p>
+        </div>
+      </section>
+
+      <!-- VIEW 2: AUTOLEGENDA -->
+      <section id="view-autolegenda" class="hidden space-y-8 max-w-xl mx-auto w-full py-2">
+        <div class="text-center space-y-2 pt-2">
+          <h2 class="text-2xl sm:text-3xl font-serif text-stone-100 font-normal">
+            Legende seu vídeo <br><span class="italic text-gold-400">automaticamente</span>
+          </h2>
+          <p class="text-xs sm:text-sm text-stone-400 max-w-xs mx-auto font-light">
+            Nossa IA transcreve o áudio do seu vídeo e adiciona legendas com alta precisão.
+          </p>
+        </div>
+
+        <div class="border border-gold-500/30 bg-stone-900/40 backdrop-blur-md rounded-2xl p-6 sm:p-8 text-center space-y-4 shadow-2xl relative">
+          <div class="relative w-16 h-16 mx-auto rounded-2xl bg-gold-500/10 border border-gold-500/30 flex items-center justify-center text-gold-400">
+            <i class="fa-solid fa-play text-xl"></i>
+            <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-stone-900 border border-gold-500/50 rounded-full flex items-center justify-center text-[10px] text-gold-400">
+              <i class="fa-solid fa-plus"></i>
+            </div>
+          </div>
+
+          <div class="space-y-1">
+            <h3 class="text-lg font-serif text-stone-100">Enviei seu vídeo</h3>
+            <p class="text-[11px] text-stone-400">Formatos suportados: MP4, MOV, AVI, MKV</p>
+            <p class="text-[11px] text-stone-400">Tamanho máximo: 500MB</p>
+          </div>
+
+          <div class="pt-2">
+            <label class="inline-block px-8 py-3 rounded-xl bg-gradient-to-r from-gold-600 via-gold-500 to-gold-600 text-stone-950 font-semibold text-xs tracking-wide shadow-lg shadow-gold-500/10 hover:brightness-110 transition cursor-pointer">
+              Escolher vídeo
+              <input type="file" class="hidden" accept="video/*">
+            </label>
+          </div>
+
+          <p class="text-[11px] text-stone-500">ou arraste e solte o arquivo aqui</p>
+        </div>
+
+        <div class="space-y-4 pt-2">
+          <h4 class="text-xs font-semibold text-stone-400 uppercase tracking-wider text-left">Como funciona</h4>
+
+          <div class="flex items-center justify-between gap-1 text-center">
+            <div class="flex-1 flex flex-col items-center space-y-2">
+              <div class="w-5 h-5 rounded-full bg-stone-800 border border-stone-700 text-[10px] font-medium text-gold-400 flex items-center justify-center">1</div>
+              <div class="w-12 h-12 rounded-xl bg-stone-900/90 border border-stone-800 flex items-center justify-center text-gold-400/80 shadow-md">
+                <i class="fa-solid fa-clapperboard text-lg"></i>
+              </div>
+              <p class="text-xs font-serif text-stone-200">Envie seu vídeo</p>
+            </div>
+
+            <div class="text-stone-600 text-xs pb-4">
+              <i class="fa-solid fa-arrow-right"></i>
+            </div>
+
+            <div class="flex-1 flex flex-col items-center space-y-2">
+              <div class="w-5 h-5 rounded-full bg-stone-800 border border-stone-700 text-[10px] font-medium text-gold-400 flex items-center justify-center">2</div>
+              <div class="w-12 h-12 rounded-xl bg-stone-900/90 border border-stone-800 flex items-center justify-center text-gold-400 shadow-md">
+                <i class="fa-solid fa-wand-magic-sparkles text-lg"></i>
+              </div>
+              <p class="text-xs font-serif text-stone-200">IA gera as legendas</p>
+            </div>
+
+            <div class="text-stone-600 text-xs pb-4">
+              <i class="fa-solid fa-arrow-right"></i>
+            </div>
+
+            <div class="flex-1 flex flex-col items-center space-y-2">
+              <div class="w-5 h-5 rounded-full bg-stone-800 border border-stone-700 text-[10px] font-medium text-gold-400 flex items-center justify-center">3</div>
+              <div class="w-12 h-12 rounded-xl bg-stone-900/90 border border-stone-800 flex items-center justify-center text-gold-400/80 shadow-md">
+                <i class="fa-solid fa-closed-captioning text-lg"></i>
+              </div>
+              <p class="text-xs font-serif text-stone-200">Baixe seu vídeo</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-3 pt-4 border-t border-stone-800">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-semibold text-stone-300">Recentes</h4>
+            <a href="#" class="text-xs text-gold-400 hover:underline">Ver todos</a>
+          </div>
+
+          <div class="bg-stone-900/60 border border-stone-800 rounded-xl p-2.5 flex items-center justify-between">
+            <div class="flex items-center space-x-3 min-w-0">
+              <div class="relative w-16 h-11 rounded-lg bg-stone-800 overflow-hidden shrink-0 border border-stone-700">
+                <img src="https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=200&auto=format&fit=crop&q=80" class="w-full h-full object-cover" alt="Viagem para o deserto">
+                <span class="absolute bottom-0.5 right-0.5 bg-black/80 text-[8px] text-stone-200 px-1 rounded">02:45</span>
+              </div>
+              <div class="min-w-0">
+                <p class="text-xs font-medium text-stone-200 truncate">Viagem para o deserto.mp4</p>
+                <p class="text-[10px] text-stone-400">Legendas geradas com sucesso</p>
+              </div>
+            </div>
+
+            <div class="flex items-center space-x-3 shrink-0 pl-2">
+              <span class="text-[10px] text-stone-500">24/05/2024</span>
+              <button class="text-stone-400 hover:text-stone-200 p-1">
+                <i class="fa-solid fa-ellipsis-vertical text-xs"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- PAINEL DIREITO (IA STUDIO) -->
+    <aside id="right-sidebar" class="hidden lg:flex flex-col w-72 border-l border-stone-800/80 bg-dark-800/50 p-4 space-y-6 shrink-0 h-full">
+      <div class="bg-stone-900/60 border border-stone-800 rounded-2xl p-4 space-y-4">
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-wand-magic-sparkles text-gold-400"></i>
+          <h3 class="font-semibold text-stone-100 text-sm">IA STUDIO</h3>
+        </div>
+        <p class="text-xs text-stone-400">Inteligência que transforma suas fotos.</p>
+
+        <div class="space-y-2">
+          <button class="w-full p-2.5 rounded-xl bg-stone-800/40 hover:bg-stone-800 border border-stone-800 text-left flex items-start space-x-3 transition">
+            <i class="fa-solid fa-wand-magic text-gold-400 mt-0.5 shrink-0 text-sm"></i>
+            <div>
+              <p class="text-xs font-medium text-stone-200">Melhorar foto</p>
+              <p class="text-[10px] text-stone-400">Ajusta luz, cor e nitidez.</p>
+            </div>
+          </button>
+          <button onclick="switchTab('autolegenda')" class="w-full p-2.5 rounded-xl bg-stone-800/40 hover:bg-stone-800 border border-stone-800 text-left flex items-start space-x-3 transition">
+            <i class="fa-solid fa-closed-captioning text-gold-400 mt-0.5 shrink-0 text-sm"></i>
+            <div>
+              <p class="text-xs font-medium text-stone-200">Legendar vídeo</p>
+              <p class="text-[10px] text-stone-400">Gera legendas automaticamente.</p>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- CARD SUGESTÃO IA -->
+      <div class="bg-stone-900/60 border border-stone-800 rounded-2xl p-4 space-y-3">
+        <h4 class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Sugestão IA</h4>
+        <div class="relative rounded-xl overflow-hidden aspect-video border border-stone-800 bg-stone-800">
+          <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='225' viewBox='0 0 400 225'><defs><linearGradient id='g' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%231c1917'/><stop offset='50%' stop-color='%23292524'/><stop offset='100%' stop-color='%2344403c'/></linearGradient><linearGradient id='gold' x1='0%' y1='0%' x2='100%' y2='0%'><stop offset='0%' stop-color='%23b8860b'/><stop offset='100%' stop-color='%23e5c158'/></linearGradient></defs><rect width='100%' height='100%' fill='url(%23g)'/><path d='M0 160 Q 100 120 200 150 T 400 130 L 400 225 L 0 225 Z' fill='%23141210' opacity='0.7'/><circle cx='300' cy='60' r='25' fill='url(%23gold)' opacity='0.8'/><path d='M50 180 L 120 100 L 180 160 L 250 80 L 350 180 Z' fill='%23292524'/><circle cx='80' cy='80' r='12' fill='%23e5c158' opacity='0.3'/><text x='50%' y='52%' dominant-baseline='middle' text-anchor='middle' fill='%23e5c158' font-family='sans-serif' font-size='14' font-weight='bold'>FOTO RECOMENDADA</text></svg>" class="w-full h-full object-cover" alt="Sugestão IA">
+        </div>
+        <p class="text-xs font-medium text-stone-200">Essa foto pode ficar ainda melhor!</p>
+        <button class="w-full py-2 bg-gold-500/10 border border-gold-500/30 text-gold-400 rounded-xl text-xs font-semibold hover:bg-gold-500/20 transition flex items-center justify-center space-x-1.5">
+          <i class="fa-solid fa-wand-magic-sparkles text-xs"></i>
+          <span>Melhorar agora</span>
+        </button>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- NAVEGAÇÃO MOBILE INFERIOR -->
+  <nav class="md:hidden fixed bottom-0 inset-x-0 bg-dark-800/95 backdrop-blur border-t border-stone-800/80 px-6 py-2 flex justify-around items-center z-50 shrink-0">
+    <button onclick="switchTab('galeria')" class="flex flex-col items-center space-y-1 text-gold-400">
+      <i class="fa-regular fa-image text-base"></i>
+      <span class="text-[10px] font-medium">Início</span>
+    </button>
+    <button onclick="switchTab('autolegenda')" class="flex flex-col items-center space-y-1 text-stone-400 hover:text-stone-200">
+      <i class="fa-solid fa-film text-base"></i>
+      <span class="text-[10px] font-medium">Meus Vídeos</span>
+    </button>
+  </nav>
+
+  <!-- LÓGICA DE TROCA DE PÁGINAS -->
+  <script>
+    function switchTab(tab) {
+      const viewGaleria = document.getElementById('view-galeria');
+      const viewAutolegenda = document.getElementById('view-autolegenda');
+      const rightSidebar = document.getElementById('right-sidebar');
+      const btnGaleria = document.getElementById('nav-galeria');
+      const btnAutolegenda = document.getElementById('nav-autolegenda');
+
+      if (tab === 'autolegenda') {
+        viewGaleria.classList.add('hidden');
+        viewAutolegenda.classList.remove('hidden');
+        if (rightSidebar) rightSidebar.classList.add('hidden');
+
+        btnAutolegenda.className = "w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition bg-gold-500/15 border border-gold-500/30 text-gold-400";
+        btnGaleria.className = "w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm text-stone-400 hover:text-stone-200 transition";
+      } else {
+        viewGaleria.classList.remove('hidden');
+        viewAutolegenda.classList.add('hidden');
+        if (rightSidebar) rightSidebar.classList.remove('hidden');
+
+        btnGaleria.className = "w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition bg-gold-500/15 border border-gold-500/30 text-gold-400";
+        btnAutolegenda.className = "w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm text-stone-400 hover:text-stone-200 transition";
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+.nav-btn {
+  color: #a8a29e;
+}
+.nav-btn:hover {
+  background-color: rgba(41, 37, 36, 0.5);
+  color: #e7e5e4;
+}
+.nav-btn.active {
+  background-color: rgba(212, 175, 55, 0.15);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  color: #d4af37;
+}

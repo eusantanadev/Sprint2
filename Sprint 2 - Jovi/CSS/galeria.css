@@ -1,0 +1,11 @@
+.cat-btn {
+  background-color: #1c1917;
+  border: 1px solid #292524;
+  color: #a8a29e;
+  transition: all 0.2s ease-in-out;
+}
+.cat-btn.active {
+  background-color: rgba(212, 175, 55, 0.2);
+  border-color: rgba(212, 175, 55, 0.5);
+  color: #d4af37;
+}
